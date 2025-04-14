@@ -8,7 +8,7 @@ import { Slider } from '@/components/ui/slider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'; // Removed CardFooter as it wasn't used
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
-import { generateLayeredOutput, InputData, LayeredOutput } from '@/ai/flows/generate-layered-output';
+import { generateLayeredOutput, GenerateLayeredOutputInput, GenerateLayeredOutputOutput } from '@/ai/flows/generate-layered-output';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Keep Popover for multi-select simulation if Select doesn't support multi-select out of the box
@@ -39,7 +39,7 @@ export const RiffusionPromptComposer = () => {
   const [theme, setTheme] = useState('');
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [aiLayers, setAiLayers] = useState<LayeredOutput | null>(null);
+  const [aiLayers, setAiLayers] = useState<GenerateLayeredOutputOutput | null>(null);
   const [moodsOpen, setMoodsOpen] = useState(false);
   const [genresOpen, setGenresOpen] = useState(false);
 
@@ -78,6 +78,13 @@ export const RiffusionPromptComposer = () => {
 
   const handleCopyClick = () => {
     navigator.clipboard.writeText(generatedPrompt);
+    toast({
+      title: "Copied to clipboard!",
+    });
+  };
+
+  const handleCopyLayerClick = (text: string) => {
+    navigator.clipboard.writeText(text);
     toast({
       title: "Copied to clipboard!",
     });
@@ -197,28 +204,38 @@ export const RiffusionPromptComposer = () => {
             </div>
 
             <Button
-              onClick={() => {
+              onClick={async () => {
                 if (!theme || selectedMoods.length === 0 || selectedGenres.length === 0) {
                   // Basic validation - ideally show a toast or message
                   console.warn("Please select theme, mood(s), and genre(s).");
+                  toast({
+                    title: "Please select theme, mood(s), and genre(s).",
+                  });
                   return;
                 }
-                const input: InputData = {
+                const input: GenerateLayeredOutputInput = {
                   theme,
                   mood: selectedMoods.join(', '), // Join moods for the current AI function
                   genres: selectedGenres,
                 };
                 try {
-                  const layers = generateLayeredOutput(input);
+                  const layers = await generateLayeredOutput(input);
                   setAiLayers(layers);
-                  // Update prompt layers based on AI suggestions + examples
-                  setPromptLayers([
-                    { id: 1, prompt: layers.Layer1.suggestedItems.join(', ') + ', shimmering bioluminescence, microscopic organisms, evolving cellular structures, iridescent bubbles, flowing data streams, holographic projections, ethereal glow, Beegees-inspired harmonies, smooth textures, pastel color palettes', strength: 100, start: 0, end: 10 },
-                    { id: 2, prompt: layers.Layer2.suggestedItems.join(', ') + ', cascading piano arpeggios, dramatic lighting, gothic architecture dissolving into scientific diagrams, flowing silk fabrics representing neural networks, emotional intensity, minor key progressions, delicate ornamentation, Chopin’s elegant complexity', strength: 100, start: 0, end: 10 },
-                    { id: 3, prompt: layers.Layer3.suggestedItems.join(', ') + ', glitching digital landscapes, neon-lit laboratories, kawaii aesthetics colliding with scientific instruments, distorted 8-bit sounds, rapid-fire drum beats, screaming vocals, energetic guitar riffs, robotic textures, Baby Metal’s energetic chaos, evolving patterns, glitch art', strength: 100, start: 0, end: 10 },
-                  ]);
+
+                  if (layers) {
+                    // Update prompt layers based on AI suggestions
+                    setPromptLayers([
+                      { id: 1, prompt: layers.layer1Prompt, strength: 100, start: 0, end: 10 },
+                      { id: 2, prompt: layers.layer2Prompt, strength: 100, start: 0, end: 10 },
+                      { id: 3, prompt: layers.layer3Prompt, strength: 100, start: 0, end: 10 },
+                    ]);
+                  }
+
                 } catch (error) {
                   console.error("Error generating AI layers:", error);
+                  toast({
+                    title: "Error generating AI layers.",
+                  });
                   // Handle error - maybe show a toast to the user
                 }
               }}
@@ -226,26 +243,54 @@ export const RiffusionPromptComposer = () => {
             >
               Generate AI Layers
             </Button>
+            {aiLayers && (
+              <Button variant="outline" size="sm" onClick={handleCopyClick}>
+                <Icons.copy className="h-4 w-4 mr-2" /> Copy
+              </Button>
+            )}
 
             {/* Display Generated AI Layers */}
             {aiLayers && (
               <div className="grid gap-4 mt-4"> {/* Added margin top */}
                 <h3 className="text-lg font-semibold">Generated Layer Suggestions:</h3> {/* Title */}
-                {Object.entries(aiLayers).map(([layerName, layer]) => (
-                  <Card key={layerName}>
-                    <CardHeader>
-                      <CardTitle>{layerName}</CardTitle>
-                      <CardDescription>{layer.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-disc pl-5 space-y-1"> {/* Added spacing */}
-                        {layer.suggestedItems.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                ))}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Layer 1</CardTitle>
+                    <CardDescription>Foundational layer</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea value={aiLayers.layer1Prompt} readOnly rows={4}/>
+                     <Button variant="outline" size="sm" onClick={() => handleCopyLayerClick(aiLayers.layer1Prompt)}>
+                        <Icons.copy className="h-4 w-4 mr-2" /> Copy Suggestions
+                      </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Layer 2</CardTitle>
+                    <CardDescription>Supporting layer</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea value={aiLayers.layer2Prompt} readOnly rows={4}/>
+                     <Button variant="outline" size="sm" onClick={() => handleCopyLayerClick(aiLayers.layer2Prompt)}>
+                        <Icons.copy className="h-4 w-4 mr-2" /> Copy Suggestions
+                      </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Layer 3</CardTitle>
+                    <CardDescription>Intricate layer</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea value={aiLayers.layer3Prompt} readOnly rows={4}/>
+                    <Button variant="outline" size="sm" onClick={() => handleCopyLayerClick(aiLayers.layer3Prompt)}>
+                      <Icons.copy className="h-4 w-4 mr-2" /> Copy Suggestions
+                    </Button>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
@@ -350,4 +395,3 @@ export const RiffusionPromptComposer = () => {
     </div>
   );
 };
-

@@ -1,59 +1,77 @@
-// src/ai/flows/generate-layered-output.ts
+'use server';
+/**
+ * @fileOverview Generates layered music prompts for Riffusion using AI.
+ *
+ * - generateLayeredOutput - A function that generates three layers of music prompts for Riffusion based on user input.
+ * - GenerateLayeredOutputInput - The input type for the generateLayeredOutput function.
+ * - GenerateLayeredOutputOutput - The return type for the generateLayeredOutput function.
+ */
 
-interface LayeredOutput {
-  Layer1: {
-    description: string;
-    suggestedItems: string[];
-  };
-  Layer2: {
-    description: string;
-    suggestedItems: string[];
-  };
-  Layer3: {
-    description: string;
-    suggestedItems: string[];
-  };
+import {ai} from '@/ai/ai-instance';
+import {z} from 'genkit';
+
+const GenerateLayeredOutputInputSchema = z.object({
+  theme: z.string().describe('The overall theme or concept for the music.'),
+  mood: z.string().describe('The desired mood or emotion the music should evoke.'),
+  genres: z.array(z.string()).describe('A list of musical genres to incorporate into the prompts.'),
+});
+export type GenerateLayeredOutputInput = z.infer<typeof GenerateLayeredOutputInputSchema>;
+
+const GenerateLayeredOutputOutputSchema = z.object({
+  layer1Prompt: z.string().describe('Prompt for the foundational layer of the music.'),
+  layer2Prompt: z.string().describe('Prompt for the supporting layer, enriching the theme and mood.'),
+  layer3Prompt: z.string().describe('Prompt for the intricate layer, adding depth and complexity.'),
+});
+export type GenerateLayeredOutputOutput = z.infer<typeof GenerateLayeredOutputOutputSchema>;
+
+export async function generateLayeredOutput(input: GenerateLayeredOutputInput): Promise<GenerateLayeredOutputOutput> {
+  return generateLayeredOutputFlow(input);
 }
 
-interface InputData {
-  theme: string;
-  mood: string;
-  genres: string[];
-}
+const generateLayeredOutputPrompt = ai.definePrompt({
+  name: 'generateLayeredOutputPrompt',
+  input: {
+    schema: z.object({
+      theme: z.string().describe('The overall theme or concept for the music.'),
+      mood: z.string().describe('The desired mood or emotion the music should evoke.'),
+      genres: z.string().describe('A comma-separated list of musical genres to incorporate into the prompts.'),
+    }),
+  },
+  output: {
+    schema: z.object({
+      layer1Prompt: z.string().describe('Prompt for the foundational layer of the music.'),
+      layer2Prompt: z.string().describe('Prompt for the supporting layer, enriching the theme and mood.'),
+      layer3Prompt: z.string().describe('Prompt for the intricate layer, adding depth and complexity.'),
+    }),
+  },
+  prompt: `You are an AI music prompt engineer specializing in generating layered prompts for Riffusion.
+  Based on the user's desired theme, mood, and genres, provide three distinct prompts, one for each layer.
 
-function generateLayeredOutput(input: InputData): LayeredOutput {
-  const { theme, mood, genres } = input;
-  const genreString = genres.join(', ');
+  The prompts should be descriptive, musical, and creative, suitable for use with Riffusion.
+  Each layer should build upon the previous one, adding depth and complexity to the overall musical idea.
 
-  const layer1 = {
-    description: `Establish the core of a ${mood} experience within the ${theme} realm, focusing on the foundational genres: ${genreString}.`,
-    suggestedItems: [
-      `The essence of ${theme} infused with ${mood}`,
-      `Dominant traits reflecting ${mood}`,
-      `Genre backbone: ${genreString}`,
-    ],
-  };
+  Theme: {{{theme}}}
+  Mood: {{{mood}}}
+  Genres: {{{genres}}}
 
-  const layer2 = {
-    description: `Introduce supporting elements to enrich the ${theme} and ${mood} interplay, drawing inspiration from related genres.`,
-    suggestedItems: [
-      `Harmonizing details that echo ${theme}`,
-      `Nuances that amplify the ${mood}`,
-      `Genre variations subtly woven in`,
-    ],
-  };
+  Respond with the three prompts, making sure to fill all fields in the output schema. Do not return anything besides the JSON response.
+  `,
+});
 
-  const layer3 = {
-    description: `Incorporate intricate details that add depth and complexity to the ${theme} and ${mood} fusion, hinting at cross-genre influences.`,
-    suggestedItems: [
-      `Delicate touches that define ${theme}`,
-      `Subliminal cues that evoke ${mood}`,
-      `Cross-genre blends subtly integrated`,
-    ],
-  };
-
-  return { Layer1: layer1, Layer2: layer2, Layer3: layer3 };
-}
-
-export { generateLayeredOutput };
-export type {InputData, LayeredOutput}
+const generateLayeredOutputFlow = ai.defineFlow<
+  typeof GenerateLayeredOutputInputSchema,
+  typeof GenerateLayeredOutputOutputSchema
+>({
+  name: 'generateLayeredOutputFlow',
+  inputSchema: GenerateLayeredOutputInputSchema,
+  outputSchema: GenerateLayeredOutputOutputSchema,
+},
+async input => {
+  const {theme, mood, genres} = input;
+  const {output} = await generateLayeredOutputPrompt({
+    theme: theme,
+    mood: mood,
+    genres: genres.join(', '),
+  });
+  return output!;
+});
