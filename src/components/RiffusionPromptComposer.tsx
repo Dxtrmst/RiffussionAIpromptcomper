@@ -209,7 +209,7 @@ export const RiffusionPromptComposer = () => {
                   // Basic validation - ideally show a toast or message
                   console.warn("Please select theme, mood(s), and genre(s).");
                   toast({
-                    title: "Please select theme, mood(s), and genre(s).",
+                    title: "Please select a theme, mood(s), and genre(s). All are required.",
                   });
                   return;
                 }
@@ -219,6 +219,8 @@ export const RiffusionPromptComposer = () => {
                   genres: selectedGenres,
                 };
                 try {
+                  console.log("generateLayeredOutput called with:", { theme, selectedMoods, selectedGenres });
+
                   const layers = await generateLayeredOutput(input);
                   setAiLayers(layers);
 
@@ -235,6 +237,7 @@ export const RiffusionPromptComposer = () => {
                   console.error("Error generating AI layers:", error);
                   toast({
                     title: "Error generating AI layers.",
+                    description: error instanceof Error ? error.stack : undefined,
                   });
                   // Handle error - maybe show a toast to the user
                 }

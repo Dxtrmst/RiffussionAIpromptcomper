@@ -64,6 +64,7 @@ const generateLayeredOutputFlow = ai.defineFlow<
 >({
   name: 'generateLayeredOutputFlow',
   inputSchema: GenerateLayeredOutputInputSchema,
+
   outputSchema: GenerateLayeredOutputOutputSchema,
 },
 async input => {
@@ -73,5 +74,10 @@ async input => {
     mood: mood,
     genres: genres.join(', '),
   });
-  return output!;
+  console.log("generateLayeredOutputFlow input:", input);
+  console.log("generateLayeredOutputFlow output:", output);
+  if (!output) {
+        throw new Error('Failed to generate prompts.');
+  }
+  return output;
 });
