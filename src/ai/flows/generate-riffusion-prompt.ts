@@ -8,7 +8,6 @@
  * - GenerateRiffusionPromptInput - The input type for the generateRiffusionPromptFlow function.
  * - GenerateRiffusionPromptOutput - The return type for the generateRiffusionPromptFlow function.
  */
-
 import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
 import {generateRiffusionPrompt} from '@/services/riffusion';
