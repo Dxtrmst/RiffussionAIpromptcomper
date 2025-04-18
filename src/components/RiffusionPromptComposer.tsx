@@ -4,11 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-// Slider might not be needed anymore if we remove manual layer editing
-// import { Slider } from '@/components/ui/slider';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-// Tabs are removed
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { generateLayeredOutput, GenerateLayeredOutputInput, GenerateLayeredOutputOutput } from '@/ai/flows/generate-layered-output';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,20 +15,11 @@ import { Icons } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 
 
-// initialPromptLayers is removed as we won't manually edit layers
-// const initialPromptLayers = [
-//   { id: 1, prompt: '', strength: 100, start: 0, end: 10 },
-//   { id: 2, prompt: '', strength: 100, start: 0, end: 10 },
-//   { id: 3, prompt: '', strength: 100, start: 0, end: 10 },
-// ];
 
 export const RiffusionPromptComposer = () => {
-  // promptLayers state is removed
-  // const [promptLayers, setPromptLayers] = useState(initialPromptLayers);
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const { toast } = useToast();
 
-  // --- Existing Mood and Genre Lists ---
   const moodList = [
     'Happy', 'Sad', 'Energetic', 'Calm', 'Romantic', 'Angry', 'Mysterious', 'Hopeful', 'Melancholic', 'Uplifting', 'Peaceful', 'Dark', 'Dreamy', 'Aggressive', 'Chill', 'Epic', 'Nostalgic', 'Anxious', 'Excited', 'Reflective', 'Funky', 'Groovy', 'Intense', 'Playful', 'Solemn'
   ];
@@ -46,11 +33,8 @@ export const RiffusionPromptComposer = () => {
   const [aiLayers, setAiLayers] = useState<GenerateLayeredOutputOutput | null>(null);
   const [moodsOpen, setMoodsOpen] = useState(false);
   const [genresOpen, setGenresOpen] = useState(false);
-  const [isSuggesting, setIsSuggesting] = useState(false); // Loading state for suggestions
+  const [isSuggesting, setIsSuggesting] = useState(false);
 
-  // handlePromptChange is removed
-
-  // Renamed and modified to generate the final prompt from AI suggestions
   const handleGenerateRiffusionPrompt = () => {
     if (!aiLayers) {
        toast({
@@ -73,8 +57,6 @@ export const RiffusionPromptComposer = () => {
      });
   };
 
-
-  // --- Existing Mood/Genre Selection Handlers ---
   const handleMoodSelect = (mood: string) => {
     setSelectedMoods(prev =>
       prev.includes(mood)
@@ -107,13 +89,49 @@ export const RiffusionPromptComposer = () => {
     });
   };
 
+  const handleAISuggestion = async () => {
+    if (!theme || selectedMoods.length === 0 || selectedGenres.length === 0) {
+      toast({
+        title: "Input missing",
+        description: "Please provide a theme, at least one mood, and at least one genre.",
+        variant: "warning",
+      });
+      return;
+    }
+    setIsSuggesting(true);
+    setAiLayers(null);
+    setGeneratedPrompt('');
+    const input: GenerateLayeredOutputInput = {
+      theme,
+      mood: selectedMoods.join(', '),
+      genres: selectedGenres,
+    };
+    try {
+      console.log("Calling generateLayeredOutput with:", input);
+      const layers = await generateLayeredOutput(input);
+      setAiLayers(layers);
+      toast({
+        title: "AI Suggestions Generated!",
+      });
+       console.log("Received layers:", layers);
+    } catch (error) {
+      console.error("Error generating AI layers:", error);
+      toast({
+        title: "Error Generating Suggestions",
+        description: error instanceof Error ? error.message : "An unknown error occurred.",
+        variant: "destructive",
+      });
+       setAiLayers(null);
+    } finally {
+       setIsSuggesting(false);
+    }
+  };
+
 
   return (
-    // Removed Tabs component wrapper
     <div className="flex flex-col space-y-4 w-full max-w-3xl">
-      {/* Content previously under "Suggestions" tab */}
-      <div className="grid gap-4 p-4 border rounded-md"> {/* Added border & rounded */}
-        <h2 className="text-xl font-semibold mb-2">Generate Prompt Suggestions</h2> {/* Added title */}
+      <div className="grid gap-4 p-4 border rounded-md">
+        <h2 className="text-xl font-semibold mb-2">Generate Prompt Suggestions</h2>
         <div className="grid gap-2">
           <Label htmlFor="theme">Theme</Label>
           <Input
@@ -121,7 +139,7 @@ export const RiffusionPromptComposer = () => {
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
             placeholder="e.g., Underwater City, Cyberpunk Forest"
-            disabled={isSuggesting} // Disable input while suggesting
+            disabled={isSuggesting}
           />
         </div>
 
@@ -135,7 +153,7 @@ export const RiffusionPromptComposer = () => {
                 role="combobox"
                 aria-expanded={moodsOpen}
                 className="w-full justify-between"
-                 disabled={isSuggesting} // Disable input while suggesting
+                 disabled={isSuggesting}
               >
                 {selectedMoods.length > 0
                   ? `${selectedMoods.length} selected`
@@ -148,7 +166,7 @@ export const RiffusionPromptComposer = () => {
                    <div
                      key={mood}
                      className="flex items-center space-x-2 p-2 hover:bg-accent rounded-md cursor-pointer"
-                     onClick={() => !isSuggesting && handleMoodSelect(mood)} // Prevent clicking while loading
+                     onClick={() => !isSuggesting && handleMoodSelect(mood)}
                    >
                      <Checkbox
                        id={`mood-${mood}`}
@@ -183,7 +201,7 @@ export const RiffusionPromptComposer = () => {
                  role="combobox"
                  aria-expanded={genresOpen}
                  className="w-full justify-between"
-                 disabled={isSuggesting} // Disable input while suggesting
+                 disabled={isSuggesting}
                >
                  {selectedGenres.length > 0
                    ? `${selectedGenres.length} selected`
@@ -196,7 +214,7 @@ export const RiffusionPromptComposer = () => {
                    <div
                      key={genre}
                      className="flex items-center space-x-2 p-2 hover:bg-accent rounded-md cursor-pointer"
-                     onClick={() => !isSuggesting && handleGenreSelect(genre)} // Prevent clicking while loading
+                     onClick={() => !isSuggesting && handleGenreSelect(genre)}
                    >
                      <Checkbox
                        id={`genre-${genre}`}
@@ -223,99 +241,57 @@ export const RiffusionPromptComposer = () => {
 
         {/* Button to trigger AI suggestion */}
         <Button
-          onClick={async () => {
-            if (!theme || selectedMoods.length === 0 || selectedGenres.length === 0) {
-              toast({
-                title: "Input missing",
-                description: "Please provide a theme, at least one mood, and at least one genre.",
-                variant: "warning", // Use warning variant
-              });
-              return;
-            }
-            setIsSuggesting(true); // Set loading state
-            setAiLayers(null); // Clear previous suggestions
-            setGeneratedPrompt(''); // Clear previous generated prompt
-            const input: GenerateLayeredOutputInput = {
-              theme,
-              mood: selectedMoods.join(', '),
-              genres: selectedGenres,
-            };
-            try {
-              console.log("Calling generateLayeredOutput with:", input);
-              const layers = await generateLayeredOutput(input);
-              setAiLayers(layers);
-              toast({
-                title: "AI Suggestions Generated!",
-              });
-               console.log("Received layers:", layers);
-               // No longer need to update promptLayers state here
-            } catch (error) {
-              console.error("Error generating AI layers:", error);
-              toast({
-                title: "Error Generating Suggestions",
-                description: error instanceof Error ? error.message : "An unknown error occurred.",
-                variant: "destructive",
-              });
-               setAiLayers(null); // Ensure layers are null on error
-            } finally {
-               setIsSuggesting(false); // Reset loading state
-            }
-          }}
-          disabled={!theme || selectedMoods.length === 0 || selectedGenres.length === 0 || isSuggesting} // Disable if inputs missing or loading
+          onClick={handleAISuggestion}
+          disabled={!theme || selectedMoods.length === 0 || selectedGenres.length === 0 || isSuggesting}
         >
          {isSuggesting ? <><Icons.spinner className="mr-2 h-4 w-4 animate-spin" /> Suggesting...</> : "Suggest Prompt Layers"}
         </Button>
 
         {/* Display Generated AI Layers */}
-        {aiLayers && !isSuggesting && ( // Only show if layers exist and not currently loading
-          <div className="grid gap-4 mt-4 border-t pt-4"> {/* Added separator */}
+        {aiLayers && !isSuggesting && (
+          <div className="grid gap-4 mt-4 border-t pt-4">
             <h3 className="text-lg font-semibold">Generated Layer Suggestions:</h3>
-             {/* Simplified display of layers */}
              {[
                 { title: "Layer 1 (Foundational)", prompt: aiLayers.layer1Prompt },
                 { title: "Layer 2 (Supporting)", prompt: aiLayers.layer2Prompt },
                 { title: "Layer 3 (Intricate)", prompt: aiLayers.layer3Prompt },
-             ].map((layer, index) => layer.prompt && ( // Only render if prompt exists
+             ].map((layer, index) => layer.prompt && (
                  <Card key={index}>
-                   <CardHeader className="pb-2 pt-4"> {/* Adjust padding */}
+                   <CardHeader className="pb-2 pt-4">
                      <div className="flex justify-between items-center">
-                        <CardTitle className="text-base">{layer.title}</CardTitle> {/* Smaller title */}
+                        <CardTitle className="text-base">{layer.title}</CardTitle>
                          <Button variant="outline" size="sm" onClick={() => handleCopyLayerClick(layer.prompt)}>
                             <Icons.copy className="h-3 w-3 mr-1" /> Copy
                          </Button>
                      </div>
                    </CardHeader>
                    <CardContent>
-                     <p className="text-sm text-muted-foreground">{layer.prompt}</p> {/* Display as paragraph */}
+                     <p className="text-sm text-muted-foreground">{layer.prompt}</p>
                    </CardContent>
                  </Card>
              ))}
           </div>
         )}
-      </div> {/* End of Suggestions section */}
+      </div>
 
-      {/* Removed Manual Prompts and Presets Tabs Content */}
-
-      {/* Generate Final Combined Prompt Button - Now outside tabs */}
-      <div className="p-4 border rounded-md mt-4"> {/* Added border, rounded, margin */}
-        <h2 className="text-xl font-semibold mb-2">Generate Final Prompt</h2> {/* Added title */}
+      <div className="p-4 border rounded-md mt-4">
+        <h2 className="text-xl font-semibold mb-2">Generate Final Prompt</h2>
         <Button
            onClick={handleGenerateRiffusionPrompt}
            className="w-full"
-           disabled={!aiLayers || isSuggesting} // Disable if no AI layers or suggesting
+           disabled={!aiLayers || isSuggesting}
         >
           Generate Riffusion Prompt
         </Button>
         {generatedPrompt && (
           <Card className="mt-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base">Final Combined Prompt</CardTitle> {/* Smaller title */}
+              <CardTitle className="text-base">Final Combined Prompt</CardTitle>
               <Button variant="ghost" size="sm" onClick={handleCopyClick} disabled={!generatedPrompt}>
                 <Icons.copy className="h-4 w-4 mr-2" />
                 Copy
               </Button>
             </CardHeader>
-             {/* Removed CardDescription for brevity */}
             <CardContent>
               <Textarea value={generatedPrompt} readOnly rows={4}/>
             </CardContent>
@@ -325,3 +301,4 @@ export const RiffusionPromptComposer = () => {
     </div>
   );
 };
+
