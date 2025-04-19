@@ -44,7 +44,20 @@ export const RiffusionPromptComposer = () => {
        });
        return;
     }
-    // Extract keywords from each layer and join them with commas
+
+    // Define stop words to exclude from keywords
+    const stopWords = new Set([
+      "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
+      "of", "with", "and", "or", "but", "in", "on", "at", "to", "from",
+      "by", "for", "about", "above", "below", "than", "then", "since",
+      "before", "after", "during", "without", "under", "over", "between",
+      "among", "through", "into", "onto", "as", "like", "that", "which",
+      "who", "whom", "this", "these", "those", "it", "its", "he", "she",
+      "him", "her", "his", "hers", "we", "us", "our", "ours", "you", "your",
+      "yours", "they", "them", "their", "theirs"
+    ]);
+
+    // Extract keywords from each layer, filter out stop words, and join them with commas
     const combinedPrompt = [
         aiLayers.layer1Prompt,
         aiLayers.layer2Prompt,
@@ -52,7 +65,9 @@ export const RiffusionPromptComposer = () => {
     ].filter(p => p)
      .map(prompt => {
          // Basic keyword extraction (split by spaces and commas)
-         const keywords = prompt.split(/[,\s]+/).filter(Boolean);
+         const keywords = prompt.split(/[,\s]+/)
+                             .filter(word => word.length > 2 && !stopWords.has(word.toLowerCase())) // Filter out short and stop words
+                             .filter(Boolean);
          return keywords.join(', ');
      })
     .join(', ');
@@ -136,10 +151,10 @@ export const RiffusionPromptComposer = () => {
 
 
   return (
-    <div className="flex flex-col space-y-4 w-full max-w-3xl">
-      <div className="grid gap-4 p-4 border rounded-md">
+    
+      
         <h2 className="text-xl font-semibold mb-2">Generate Prompt Suggestions</h2>
-        <div className="grid gap-2">
+        
           <Label htmlFor="theme">Theme</Label>
           <Input
             id="theme"
@@ -148,10 +163,10 @@ export const RiffusionPromptComposer = () => {
             placeholder="e.g., Underwater City, Cyberpunk Forest"
             disabled={isSuggesting}
           />
-        </div>
+        
 
         {/* Mood Multi-Select */}
-        <div className="grid gap-2">
+        
           <Label>Moods</Label>
           <Popover open={moodsOpen} onOpenChange={setMoodsOpen}>
             <PopoverTrigger asChild>
@@ -168,14 +183,10 @@ export const RiffusionPromptComposer = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-               <div className="p-2 max-h-60 overflow-y-auto">
+               
                  {moodList.map((mood) => (
-                   <div
-                     key={mood}
-                     className="flex items-center space-x-2 p-2 hover:bg-accent rounded-md cursor-pointer"
-                     onClick={() => !isSuggesting && handleMoodSelect(mood)}
-                   >
-                     <Checkbox
+                   
+                     
                        id={`mood-${mood}`}
                        checked={selectedMoods.includes(mood)}
                        onCheckedChange={() => handleMoodSelect(mood)}
@@ -184,22 +195,22 @@ export const RiffusionPromptComposer = () => {
                      <Label htmlFor={`mood-${mood}`} className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}>
                        {mood}
                      </Label>
-                   </div>
+                   
                  ))}
-               </div>
+               
             </PopoverContent>
           </Popover>
-          <div className="flex flex-wrap gap-1 mt-1">
+          
             {selectedMoods.map((mood) => (
-              <Badge key={mood} variant="secondary" className="cursor-pointer" onClick={() => !isSuggesting && handleMoodSelect(mood)}>
+              
                 {mood} &times;
-              </Badge>
+              
             ))}
-          </div>
-        </div>
+          
+        
 
         {/* Genre Multi-Select */}
-        <div className="grid gap-2">
+        
           <Label>Genres</Label>
           <Popover open={genresOpen} onOpenChange={setGenresOpen}>
              <PopoverTrigger asChild>
@@ -216,14 +227,10 @@ export const RiffusionPromptComposer = () => {
                </Button>
              </PopoverTrigger>
              <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-               <div className="p-2 max-h-60 overflow-y-auto">
+               
                  {genreList.map((genre) => (
-                   <div
-                     key={genre}
-                     className="flex items-center space-x-2 p-2 hover:bg-accent rounded-md cursor-pointer"
-                     onClick={() => !isSuggesting && handleGenreSelect(genre)}
-                   >
-                     <Checkbox
+                   
+                     
                        id={`genre-${genre}`}
                        checked={selectedGenres.includes(genre)}
                        onCheckedChange={() => handleGenreSelect(genre)}
@@ -232,19 +239,19 @@ export const RiffusionPromptComposer = () => {
                      <Label htmlFor={`genre-${genre}`} className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}>
                        {genre}
                      </Label>
-                   </div>
+                   
                  ))}
-               </div>
+               
              </PopoverContent>
            </Popover>
-          <div className="flex flex-wrap gap-1 mt-1">
+          
             {selectedGenres.map((genre) => (
-               <Badge key={genre} variant="secondary" className="cursor-pointer" onClick={() => !isSuggesting && handleGenreSelect(genre)}>
+               
                  {genre} &times;
-              </Badge>
+              
             ))}
-          </div>
-        </div>
+          
+        
 
         {/* Button to trigger AI suggestion */}
         <Button
@@ -256,32 +263,31 @@ export const RiffusionPromptComposer = () => {
 
         {/* Display Generated AI Layers */}
         {aiLayers && !isSuggesting && (
-          <div className="grid gap-4 mt-4 border-t pt-4">
+          
             <h3 className="text-lg font-semibold">Generated Layer Suggestions:</h3>
              {[
                 { title: "Layer 1 (Foundational)", prompt: aiLayers.layer1Prompt },
                 { title: "Layer 2 (Supporting)", prompt: aiLayers.layer2Prompt },
                 { title: "Layer 3 (Intricate)", prompt: aiLayers.layer3Prompt },
              ].map((layer, index) => layer.prompt && (
-                 <Card key={index}>
-                   <CardHeader className="pb-2 pt-4">
-                     <div className="flex justify-between items-center">
-                        <CardTitle className="text-base">{layer.title}</CardTitle>
-                         <Button variant="outline" size="sm" onClick={() => handleCopyLayerClick(layer.prompt)}>
-                            <Icons.copy className="h-3 w-3 mr-1" /> Copy
-                         </Button>
-                     </div>
-                   </CardHeader>
-                   <CardContent>
-                     <p className="text-sm text-muted-foreground">{layer.prompt}</p>
-                   </CardContent>
-                 </Card>
+                 
+                   
+                     
+                        
+                         {layer.title}
+                          Copy
+                     
+                   
+                   
+                     
+                   
+                 
              ))}
-          </div>
+          
         )}
-      </div>
+      
 
-      <div className="p-4 border rounded-md mt-4">
+      
         <h2 className="text-xl font-semibold mb-2">Generate Final Prompt</h2>
         <Button
            onClick={handleGenerateRiffusionPrompt}
@@ -291,20 +297,20 @@ export const RiffusionPromptComposer = () => {
           Generate Riffusion Prompt
         </Button>
         {generatedPrompt && (
-          <Card className="mt-4">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base">Final Combined Prompt</CardTitle>
-              <Button variant="ghost" size="sm" onClick={handleCopyClick} disabled={!generatedPrompt}>
-                <Icons.copy className="h-4 w-4 mr-2" />
-                Copy
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <Textarea value={generatedPrompt} readOnly rows={4}/>
-            </CardContent>
-          </Card>
+          
+            
+              
+                Final Combined Prompt
+                
+                  Copy
+                
+              
+            
+              
+            
+          
         )}
-      </div>
-    </div>
+      
+    
   );
 };
