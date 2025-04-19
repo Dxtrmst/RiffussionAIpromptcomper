@@ -458,7 +458,7 @@ export const RiffusionPromptComposer = () => {
     'Xmas',
     'Yacht Rock',
     'Yo-pop',
-    'Zouk',
+    'Zouk'
   ];
 
   const [theme, setTheme] = useState('');
@@ -644,14 +644,16 @@ export const RiffusionPromptComposer = () => {
       
         <h2 className="text-xl font-semibold mb-2">Generate Prompt Suggestions</h2>
         
-          <Label htmlFor="theme">Theme</Label>
-          <Input
-            id="theme"
-            value={theme}
-            onChange={e => setTheme(e.target.value)}
-            placeholder="e.g., Underwater City, Cyberpunk Forest"
-            disabled={isSuggesting}
-          />
+          
+            <Label htmlFor="theme">Theme</Label>
+            <Input
+              id="theme"
+              value={theme}
+              onChange={e => setTheme(e.target.value)}
+              placeholder="e.g., Underwater City, Cyberpunk Forest"
+              disabled={isSuggesting}
+            />
+          
         
 
         {/* Mood Multi-Select */}
