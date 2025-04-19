@@ -18,129 +18,130 @@ import {Checkbox} from '@/components/ui/checkbox';
 import {Icons} from '@/components/icons';
 import {useToast} from '@/hooks/use-toast';
 import {ScrollArea} from "@/components/ui/scroll-area";
+import { generateLyrics, GenerateLyricsInput, GenerateLyricsOutput } from '@/ai/flows/generate-lyrics';
 
 export const RiffusionPromptComposer = () => {
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const {toast} = useToast();
 
   const moodList = [
-    'Upbeat',
-    'Catchy',
-    'Radiant',
-    'Anthemic',
-    'Danceable',
-    'Bubble-gum',
-    'Hopeful',
-    'Vulnerable',
-    'Lonely',
-    'Rebellious',
-    'Gritty',
-    'Driving',
-    'Raw',
-    'Defiant',
-    'Anxious',
-    'Resolute',
-    'Smooth',
-    'Sultry',
-    'Sophisticated',
-    'Improvisational',
-    'Laid-back',
-    'Swinging',
-    'Majestic',
-    'Serene',
-    'Dramatic',
-    'Contemplative',
-    'Pastoral',
-    'Romantic',
-    'Futuristic',
-    'Hypnotic',
-    'Trippy',
-    'Aggressive',
-    'Fierce',
-    'Intense',
-    'Brooding',
-    'Epic',
-    'Technical',
-    'Meditative',
-    'Ethereal',
-    'Spacious',
-    'Minimalistic',
-    'Transcendental',
-    'Organic',
-    'Groovy',
-    'Uplifting',
-    'I-rie',
-    'Skanking',
-    'Earthy',
-    'Earnest',
-    'Wistful',
-    'Acoustic',
-    'Storytelling',
-    'Happy',
-    'Cheerful',
-    'Joyful',
-    'Bright',
-    'Sunny',
-    'Optimistic',
-    'Playful',
-    'Energetic',
-    'Excited',
-    'Triumphant',
-    'Empowering',
-    'Motivational',
-    'Pounding',
-    'Sad',
-    'Melancholic',
-    'Sorrowful',
-    'Mournful',
-    'Heartbreaking',
-    'Pensive',
-    'Desolate',
-    'Calm',
-    'Peaceful',
-    'Dreamy',
-    'Chill',
-    'Mellow',
-    'Soothing',
-    'Tender',
-    'Intimate',
-    'Sensual',
-    'Passionate',
-    'Dark',
-    'Ominous',
-    'Suspenseful',
-    'Tense',
-    'Foreboding',
-    'Eerie',
-    'Haunting',
-    'Spiritual',
-    'Transcendent',
-    'Mystical',
-    'Worshipful',
-    'Reflective',
-    'Introspective',
-    'Thoughtful',
-    'Philosophical',
-    'Yearning',
-    'Vintage',
-    'Retro',
-    'Whimsical',
-    'Quirky',
-    'Humorous',
-    'Fun',
-    'Cinematic',
-    'Grand',
-    'Heroic',
-    'Monumental',
-    'Funky',
-    'Jazzy',
-    'Atmospheric',
-    'Ambient',
-    'Spacey',
-    'Brutal',
-    'Innocent',
-    'Childlike',
-    'Naïve',
+    "Upbeat",
+    "Catchy",
+    "Radiant",
+    "Anthemic",
+    "Danceable",
+    "Bubble-gum",
+    "Hopeful",
+    "Vulnerable",
+    "Lonely",
+    "Rebellious",
+    "Gritty",
+    "Driving",
+    "Raw",
+    "Defiant",
+    "Anxious",
+    "Resolute",
+    "Smooth",
+    "Sultry",
+    "Sophisticated",
+    "Improvisational",
+    "Laid-back",
+    "Swinging",
+    "Majestic",
+    "Serene",
+    "Dramatic",
+    "Contemplative",
+    "Pastoral",
+    "Romantic",
+    "Futuristic",
+    "Hypnotic",
+    "Trippy",
+    "Aggressive",
+    "Fierce",
+    "Intense",
+    "Brooding",
+    "Epic",
+    "Technical",
+    "Meditative",
+    "Ethereal",
+    "Spacious",
+    "Minimalistic",
+    "Transcendental",
+    "Organic",
+    "Groovy",
+    "Uplifting",
+    "I-rie",
+    "Skanking",
+    "Earthy",
+    "Earnest",
+    "Wistful",
+    "Acoustic",
+    "Storytelling",
+    "Happy",
+    "Cheerful",
+    "Joyful",
+    "Bright",
+    "Sunny",
+    "Optimistic",
+    "Playful",
+    "Energetic",
+    "Excited",
+    "Triumphant",
+    "Empowering",
+    "Motivational",
+    "Pounding",
+    "Sad",
+    "Melancholic",
+    "Sorrowful",
+    "Mournful",
+    "Heartbreaking",
+    "Pensive",
+    "Desolate",
+    "Calm",
+    "Peaceful",
+    "Dreamy",
+    "Chill",
+    "Mellow",
+    "Soothing",
+    "Tender",
+    "Intimate",
+    "Sensual",
+    "Passionate",
+    "Dark",
+    "Ominous",
+    "Suspenseful",
+    "Tense",
+    "Foreboding",
+    "Eerie",
+    "Haunting",
+    "Spiritual",
+    "Transcendent",
+    "Mystical",
+    "Worshipful",
+    "Reflective",
+    "Introspective",
+    "Thoughtful",
+    "Philosophical",
+    "Yearning",
+    "Vintage",
+    "Retro",
+    "Whimsical",
+    "Quirky",
+    "Humorous",
+    "Fun",
+    "Cinematic",
+    "Grand",
+    "Heroic",
+    "Monumental",
+    "Funky",
+    "Jazzy",
+    "Atmospheric",
+    "Ambient",
+    "Spacey",
+    "Brutal",
+    "Innocent",
+    "Childlike",
+    "Naïve",
   ];
 
   const genreList = [
@@ -562,6 +563,8 @@ export const RiffusionPromptComposer = () => {
   const [moodsOpen, setMoodsOpen] = useState(false);
   const [genresOpen, setGenresOpen] = useState(false);
   const [isSuggesting, setIsSuggesting] = useState(false);
+  const [lyrics, setLyrics] = useState<string | null>(null);
+  const [isGeneratingLyrics, setIsGeneratingLyrics] = useState(false);
 
   const handleGenerateRiffusionPrompt = () => {
     if (!aiLayers) {
@@ -707,6 +710,7 @@ export const RiffusionPromptComposer = () => {
     setIsSuggesting(true);
     setAiLayers(null);
     setGeneratedPrompt('');
+    setLyrics(null);
     const input: GenerateLayeredOutputInput = {
       theme,
       mood: selectedMoods.join(', '),
@@ -730,6 +734,43 @@ export const RiffusionPromptComposer = () => {
       setAiLayers(null);
     } finally {
       setIsSuggesting(false);
+    }
+  };
+
+  const handleGenerateLyrics = async () => {
+    if (!theme || selectedMoods.length === 0 || selectedGenres.length === 0) {
+      toast({
+        title: 'Input missing',
+        description: 'Please provide a theme, at least one mood, and at least one genre.',
+        variant: 'warning',
+      });
+      return;
+    }
+    setIsGeneratingLyrics(true);
+    setLyrics(null);
+
+    const input: GenerateLyricsInput = {
+      theme,
+      mood: selectedMoods,
+      genre: selectedGenres,
+    };
+
+    try {
+      const lyricsResult = await generateLyrics(input);
+      setLyrics(lyricsResult.lyrics);
+      toast({
+        title: 'Lyrics Generated!',
+      });
+    } catch (error) {
+      console.error('Error generating lyrics:', error);
+      toast({
+        title: 'Error Generating Lyrics',
+        description: error instanceof Error ? error.message : 'An unknown error occurred.',
+        variant: 'destructive',
+      });
+      setLyrics(null);
+    } finally {
+      setIsGeneratingLyrics(false);
     }
   };
 
@@ -862,28 +903,40 @@ export const RiffusionPromptComposer = () => {
 
         {/* Display Generated AI Layers */}
         {aiLayers && !isSuggesting && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Generated Layer Suggestions:</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                {title: 'Layer 1 (Foundational)', prompt: aiLayers.layer1Prompt},
-                {title: 'Layer 2 (Supporting)', prompt: aiLayers.layer2Prompt},
-                {title: 'Layer 3 (Intricate)', prompt: aiLayers.layer3Prompt},
-              ].map((layer, index) => layer.prompt && (
-                  <div key={index} className="grid gap-2">
-                    <div className="flex justify-between items-center">
-                      <Label>{layer.title}</Label>
-                      <Button onClick={() => handleCopyLayerClick(layer.prompt)} size="sm" className="ml-2">
-                        Copy
-                      </Button>
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Generated Layer Suggestions:</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[
+                  {title: 'Layer 1 (Foundational)', prompt: aiLayers.layer1Prompt},
+                  {title: 'Layer 2 (Supporting)', prompt: aiLayers.layer2Prompt},
+                  {title: 'Layer 3 (Intricate)', prompt: aiLayers.layer3Prompt},
+                ].map((layer, index) => layer.prompt && (
+                    <div key={index} className="grid gap-2">
+                      <div className="flex justify-between items-center">
+                        <Label>{layer.title}</Label>
+                        <Button onClick={() => handleCopyLayerClick(layer.prompt)} size="sm" className="ml-2">
+                          Copy
+                        </Button>
+                      </div>
+                      <Textarea readOnly value={layer.prompt} className="min-h-[80px]" />
                     </div>
-                    <Textarea readOnly value={layer.prompt} className="min-h-[80px]" />
-                  </div>
-                ))}
-            </CardContent>
-          </Card>
+                  ))}
+              </CardContent>
+            </Card>
+
+            {/* Lyrics Generation UI */}
+            <LyricsCard
+              theme={theme}
+              selectedMoods={selectedMoods}
+              selectedGenres={selectedGenres}
+              lyrics={lyrics}
+              isGeneratingLyrics={isGeneratingLyrics}
+              handleGenerateLyrics={handleGenerateLyrics}
+            />
+          </>
         )}
       </div>
 
@@ -916,3 +969,50 @@ export const RiffusionPromptComposer = () => {
   );
 };
 
+interface LyricsCardProps {
+  theme: string;
+  selectedMoods: string[];
+  selectedGenres: string[];
+  lyrics: string | null;
+  isGeneratingLyrics: boolean;
+  handleGenerateLyrics: () => Promise<void>;
+}
+
+const LyricsCard: React.FC<LyricsCardProps> = ({
+  theme,
+  selectedMoods,
+  selectedGenres,
+  lyrics,
+  isGeneratingLyrics,
+  handleGenerateLyrics,
+}) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Generate Lyrics</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Button
+          onClick={handleGenerateLyrics}
+          className="w-full"
+          disabled={!theme || selectedMoods.length === 0 || selectedGenres.length === 0 || isGeneratingLyrics}
+        >
+          {isGeneratingLyrics ? (
+            <>
+              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+              Generating Lyrics...
+            </>
+          ) : (
+            'Generate Lyrics'
+          )}
+        </Button>
+        {lyrics && (
+          <div className="grid gap-2 mt-4">
+            <Label>Generated Lyrics</Label>
+            <Textarea readOnly value={lyrics} className="min-h-[120px]" />
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
