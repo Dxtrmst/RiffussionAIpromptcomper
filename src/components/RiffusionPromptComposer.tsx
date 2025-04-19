@@ -716,11 +716,11 @@ export const RiffusionPromptComposer = () => {
                   : 'Select mood(s)...'}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-              <ScrollArea>
-                <div className="p-2">
+            <PopoverContent className="w-80">
+              <ScrollArea className="h-[200px] w-full">
+                <div className="grid gap-1 p-4">
                   {moodList.map(mood => (
-                    
+                    <div key={mood} className="flex items-center space-x-2">
                       <Checkbox
                         id={`mood-${mood}`}
                         checked={selectedMoods.includes(mood)}
@@ -733,19 +733,19 @@ export const RiffusionPromptComposer = () => {
                       >
                         {mood}
                       </Label>
-                    
+                    </div>
                   ))}
                 </div>
               </ScrollArea>
             </PopoverContent>
           </Popover>
-          
+          <div className="flex flex-wrap gap-1">
             {selectedMoods.map(mood => (
               <Badge key={mood} className="cursor-pointer" onClick={() => handleMoodSelect(mood)}>
                 {mood} &times;
               </Badge>
             ))}
-          
+          </div>
         </div>
 
         {/* Genre Multi-Select */}
@@ -765,11 +765,11 @@ export const RiffusionPromptComposer = () => {
                   : 'Select genre(s)...'}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-              <ScrollArea>
-                <div className="p-2" style={{ maxHeight: '300px', overflowY: 'auto', position: 'relative' }}>
+            <PopoverContent className="w-80">
+              <ScrollArea className="h-[200px] w-full">
+                <div className="grid gap-1 p-4">
                   {genreList.map(genre => (
-                    
+                    <div key={genre} className="flex items-center space-x-2">
                       <Checkbox
                         id={`genre-${genre}`}
                         checked={selectedGenres.includes(genre)}
@@ -782,19 +782,19 @@ export const RiffusionPromptComposer = () => {
                       >
                         {genre}
                       </Label>
-                    
+                    </div>
                   ))}
                 </div>
               </ScrollArea>
             </PopoverContent>
-          </Popover>
-          
+            </Popover>
+          <div className="flex flex-wrap gap-1">
             {selectedGenres.map(genre => (
               <Badge key={genre} className="cursor-pointer" onClick={() => handleGenreSelect(genre)}>
                 {genre} &times;
               </Badge>
             ))}
-          
+          </div>
         </div>
 
         {/* Button to trigger AI suggestion */}
@@ -814,54 +814,56 @@ export const RiffusionPromptComposer = () => {
 
         {/* Display Generated AI Layers */}
         {aiLayers && !isSuggesting && (
-          
-            
-              <h3 className="text-lg font-semibold">Generated Layer Suggestions:</h3>
+          <Card>
+            <CardHeader>
+              <CardTitle>Generated Layer Suggestions:</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               {[
                 {title: 'Layer 1 (Foundational)', prompt: aiLayers.layer1Prompt},
                 {title: 'Layer 2 (Supporting)', prompt: aiLayers.layer2Prompt},
                 {title: 'Layer 3 (Intricate)', prompt: aiLayers.layer3Prompt},
               ].map((layer, index) => layer.prompt && (
-                  
-                    
-                      {layer.title}
+                  <div key={index} className="grid gap-2">
+                    <div className="flex justify-between items-center">
+                      <Label>{layer.title}</Label>
                       <Button onClick={() => handleCopyLayerClick(layer.prompt)} size="sm" className="ml-2">
                         Copy
                       </Button>
-                    
-                    
-                      <Textarea readOnly value={layer.prompt} className="min-h-[80px]" />
-                    
-                  
+                    </div>
+                    <Textarea readOnly value={layer.prompt} className="min-h-[80px]" />
+                  </div>
                 ))}
-            
-          
+            </CardContent>
+          </Card>
         )}
       </div>
 
-      <div className="grid gap-4 p-4 border rounded-md">
-        <h2 className="text-xl font-semibold mb-2">Generate Final Prompt</h2>
-        <Button
-          onClick={handleGenerateRiffusionPrompt}
-          className="w-full"
-          disabled={!aiLayers || isSuggesting}
-        >
-          Generate Riffusion Prompt
-        </Button>
-        {generatedPrompt && (
-          
-            
-              Final Combined Prompt
-              <Button onClick={handleCopyClick} size="sm" className="ml-2">
-                Copy
-              </Button>
-            
-            
+      <Card>
+        <CardHeader>
+          <CardTitle>Generate Final Prompt</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button
+            onClick={handleGenerateRiffusionPrompt}
+            className="w-full"
+            disabled={!aiLayers || isSuggesting}
+          >
+            Generate Riffusion Prompt
+          </Button>
+          {generatedPrompt && (
+            <div className="grid gap-2 mt-4">
+              <div className="flex justify-between items-center">
+                <Label>Final Combined Prompt</Label>
+                <Button onClick={handleCopyClick} size="sm" className="ml-2">
+                  Copy
+                </Button>
+              </div>
               <Textarea readOnly value={generatedPrompt} className="min-h-[80px]" />
-            
-          
-        )}
-      </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
