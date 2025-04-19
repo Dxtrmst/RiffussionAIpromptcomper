@@ -54,94 +54,94 @@ export const RiffusionPromptComposer = () => {
     "Pastoral",
     "Romantic",
     "Futuristic",
-    "Hypnotic",
-    "Trippy",
-    "Aggressive",
-    "Fierce",
-    "Intense",
-    "Brooding",
-    "Epic",
-    "Technical",
-    "Meditative",
-    "Ethereal",
-    "Spacious",
-    "Minimalistic",
-    "Transcendental",
-    "Organic",
-    "Groovy",
-    "Uplifting",
-    "I-rie",
-    "Skanking",
-    "Earthy",
-    "Earnest",
-    "Wistful",
-    "Acoustic",
-    "Storytelling",
-    "Happy",
-    "Cheerful",
-    "Joyful",
-    "Bright",
-    "Sunny",
-    "Optimistic",
-    "Playful",
-    "Energetic",
-    "Excited",
-    "Triumphant",
-    "Empowering",
-    "Motivational",
-    "Pounding",
-    "Sad",
-    "Melancholic",
-    "Sorrowful",
-    "Mournful",
-    "Heartbreaking",
-    "Pensive",
-    "Desolate",
-    "Calm",
-    "Peaceful",
-    "Dreamy",
-    "Chill",
-    "Mellow",
-    "Soothing",
-    "Tender",
-    "Intimate",
-    "Sensual",
-    "Passionate",
-    "Dark",
-    "Ominous",
-    "Suspenseful",
-    "Tense",
-    "Foreboding",
-    "Eerie",
-    "Haunting",
-    "Spiritual",
-    "Transcendent",
-    "Mystical",
-    "Worshipful",
-    "Reflective",
-    "Introspective",
-    "Thoughtful",
-    "Philosophical",
-    "Yearning",
-    "Vintage",
-    "Retro",
-    "Whimsical",
-    "Quirky",
-    "Humorous",
-    "Fun",
-    "Cinematic",
-    "Grand",
-    "Heroic",
-    "Monumental",
-    "Funky",
-    "Jazzy",
-    "Atmospheric",
-    "Ambient",
-    "Spacey",
-    "Brutal",
-    "Innocent",
-    "Childlike",
-    "Naïve",
+ "Hypnotic",
+ "Trippy",
+ "Aggressive",
+ "Fierce",
+ "Intense",
+ "Brooding",
+ "Epic",
+ "Technical",
+ "Meditative",
+ "Ethereal",
+ "Spacious",
+ "Minimalistic",
+ "Transcendental",
+ "Organic",
+ "Groovy",
+ "Uplifting",
+ "I-rie",
+ "Skanking",
+ "Earthy",
+ "Earnest",
+ "Wistful",
+ "Acoustic",
+ "Storytelling",
+ "Happy",
+ "Cheerful",
+ "Joyful",
+ "Bright",
+ "Sunny",
+ "Optimistic",
+ "Playful",
+ "Energetic",
+ "Excited",
+ "Triumphant",
+ "Empowering",
+ "Motivational",
+ "Pounding",
+ "Sad",
+ "Melancholic",
+ "Sorrowful",
+ "Mournful",
+ "Heartbreaking",
+ "Pensive",
+ "Desolate",
+ "Calm",
+ "Peaceful",
+ "Dreamy",
+ "Chill",
+ "Mellow",
+ "Soothing",
+ "Tender",
+ "Intimate",
+ "Sensual",
+ "Passionate",
+ "Dark",
+ "Ominous",
+ "Suspenseful",
+ "Tense",
+ "Foreboding",
+ "Eerie",
+ "Haunting",
+ "Spiritual",
+ "Transcendent",
+ "Mystical",
+ "Worshipful",
+ "Reflective",
+ "Introspective",
+ "Thoughtful",
+ "Philosophical",
+ "Yearning",
+ "Vintage",
+ "Retro",
+ "Whimsical",
+ "Quirky",
+ "Humorous",
+ "Fun",
+ "Cinematic",
+ "Grand",
+ "Heroic",
+ "Monumental",
+ "Funky",
+ "Jazzy",
+ "Atmospheric",
+ "Ambient",
+ "Spacey",
+ "Brutal",
+ "Innocent",
+ "Childlike",
+ "Naïve",
   ];
 
   const genreList = [
@@ -774,6 +774,15 @@ export const RiffusionPromptComposer = () => {
     }
   };
 
+  const handleCopyLyricsClick = () => {
+    if (!lyrics) return;
+    navigator.clipboard.writeText(lyrics);
+    toast({
+      title: 'Copied lyrics to clipboard!',
+    });
+  };
+
+
   return (
     <div className="flex flex-col space-y-4 w-full max-w-3xl">
       <div className="grid gap-4 p-4 border rounded-md">
@@ -803,38 +812,39 @@ export const RiffusionPromptComposer = () => {
                 {selectedMoods.length > 0
                   ? `${selectedMoods.length} selected`
                   : 'Select mood(s)...'}
+                <Icons.chevronDown className="h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80">
-              <ScrollArea className="h-[200px] w-full">
-                <div className="grid gap-1 p-4">
-                  {moodList.map(mood => (
-                    <div key={mood} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`mood-${mood}`}
-                        checked={selectedMoods.includes(mood)}
-                        onCheckedChange={() => handleMoodSelect(mood)}
-                        disabled={isSuggesting}
-                      />
-                      <Label
-                        htmlFor={`mood-${mood}`}
-                        className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}
-                      >
-                        {mood}
-                      </Label>
-                    </div>
-                  ))}
+              <ScrollArea className="h-72 w-full">
+                <div className="p-2">
+                  {
+                    moodList.map(mood => (
+                      <div key={mood} className="flex items-center p-1">
+                        <Checkbox
+                          id={`mood-${mood}`}
+                          checked={selectedMoods.includes(mood)}
+                          onCheckedChange={() => handleMoodSelect(mood)}
+                          disabled={isSuggesting}
+                        />
+                        <Label
+                          htmlFor={`mood-${mood}`}
+                          className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}
+                        >
+                          {mood}
+                        </Label>
+                      </div>
+                    ))
+                  }
                 </div>
               </ScrollArea>
             </PopoverContent>
           </Popover>
-          <div className="flex flex-wrap gap-1">
-            {selectedMoods.map(mood => (
-              <Badge key={mood} className="cursor-pointer" onClick={() => handleMoodSelect(mood)}>
-                {mood} &times;
-              </Badge>
-            ))}
-          </div>
+          {selectedMoods.map(mood => (
+            <Badge key={mood} variant="secondary">
+              {mood} &times;
+            </Badge>
+          ))}
         </div>
 
         {/* Genre Multi-Select */}
@@ -852,38 +862,39 @@ export const RiffusionPromptComposer = () => {
                 {selectedGenres.length > 0
                   ? `${selectedGenres.length} selected`
                   : 'Select genre(s)...'}
+                <Icons.chevronDown className="h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80">
-              <ScrollArea className="h-[200px] w-full">
-                <div className="grid gap-1 p-4">
-                  {genreList.map(genre => (
-                    <div key={genre} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`genre-${genre}`}
-                        checked={selectedGenres.includes(genre)}
-                        onCheckedChange={() => handleGenreSelect(genre)}
-                        disabled={isSuggesting}
-                      />
-                      <Label
-                        htmlFor={`genre-${genre}`}
-                        className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}
-                      >
-                        {genre}
-                      </Label>
-                    </div>
-                  ))}
+              <ScrollArea className="h-72 w-full">
+                <div className="p-2">
+                  {
+                    genreList.map(genre => (
+                      <div key={genre} className="flex items-center p-1">
+                        <Checkbox
+                          id={`genre-${genre}`}
+                          checked={selectedGenres.includes(genre)}
+                          onCheckedChange={() => handleGenreSelect(genre)}
+                          disabled={isSuggesting}
+                        />
+                        <Label
+                          htmlFor={`genre-${genre}`}
+                          className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}
+                        >
+                          {genre}
+                        </Label>
+                      </div>
+                    ))
+                  }
                 </div>
               </ScrollArea>
             </PopoverContent>
-            </Popover>
-          <div className="flex flex-wrap gap-1">
-            {selectedGenres.map(genre => (
-              <Badge key={genre} className="cursor-pointer" onClick={() => handleGenreSelect(genre)}>
-                {genre} &times;
-              </Badge>
-            ))}
-          </div>
+          </Popover>
+          {selectedGenres.map(genre => (
+            <Badge key={genre} variant="secondary">
+              {genre} &times;
+            </Badge>
+          ))}
         </div>
 
         {/* Button to trigger AI suggestion */}
@@ -904,9 +915,11 @@ export const RiffusionPromptComposer = () => {
         {/* Display Generated AI Layers */}
         {aiLayers && !isSuggesting && (
           <>
-            <Card>
+            <Card className="mt-4">
               <CardHeader>
-                <CardTitle>Generated Layer Suggestions:</CardTitle>
+                <CardTitle>
+                  Generated Layer Suggestions:
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
@@ -935,6 +948,7 @@ export const RiffusionPromptComposer = () => {
               lyrics={lyrics}
               isGeneratingLyrics={isGeneratingLyrics}
               handleGenerateLyrics={handleGenerateLyrics}
+              handleCopyLyricsClick={handleCopyLyricsClick} // Pass the copy lyrics function
             />
           </>
         )}
@@ -942,9 +956,11 @@ export const RiffusionPromptComposer = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Generate Final Prompt</CardTitle>
+          <CardTitle>
+            Generate Final Prompt
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-2">
           <Button
             onClick={handleGenerateRiffusionPrompt}
             className="w-full"
@@ -953,7 +969,7 @@ export const RiffusionPromptComposer = () => {
             Generate Riffusion Prompt
           </Button>
           {generatedPrompt && (
-            <div className="grid gap-2 mt-4">
+            <div className="grid gap-2">
               <div className="flex justify-between items-center">
                 <Label>Final Combined Prompt</Label>
                 <Button onClick={handleCopyClick} size="sm" className="ml-2">
@@ -976,6 +992,7 @@ interface LyricsCardProps {
   lyrics: string | null;
   isGeneratingLyrics: boolean;
   handleGenerateLyrics: () => Promise<void>;
+  handleCopyLyricsClick: () => void; // Add the copy lyrics function to the props
 }
 
 const LyricsCard: React.FC<LyricsCardProps> = ({
@@ -985,11 +1002,14 @@ const LyricsCard: React.FC<LyricsCardProps> = ({
   lyrics,
   isGeneratingLyrics,
   handleGenerateLyrics,
+  handleCopyLyricsClick, // Destructure it
 }) => {
   return (
-    <Card>
+    <Card className="mt-4">
       <CardHeader>
-        <CardTitle>Generate Lyrics</CardTitle>
+        <CardTitle>
+          Generate Lyrics
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Button
@@ -1008,7 +1028,12 @@ const LyricsCard: React.FC<LyricsCardProps> = ({
         </Button>
         {lyrics && (
           <div className="grid gap-2 mt-4">
-            <Label>Generated Lyrics</Label>
+            <div className="flex justify-between items-center">
+              <Label>Generated Lyrics</Label>
+              <Button onClick={handleCopyLyricsClick} size="sm" className="ml-2">
+                Copy
+              </Button>
+            </div>
             <Textarea readOnly value={lyrics} className="min-h-[120px]" />
           </div>
         )}
