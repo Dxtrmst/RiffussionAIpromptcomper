@@ -23,32 +23,77 @@ export const RiffusionPromptComposer = () => {
   const {toast} = useToast();
 
   const moodList = [
-    'Happy',
-    'Sad',
-    'Energetic',
-    'Calm',
-    'Romantic',
-    'Angry',
-    'Mysterious',
+    'Upbeat',
+    'Catchy',
+    'Radiant',
+    'Anthemic',
+    'Danceable',
+    'Bubble-gum',
     'Hopeful',
-    'Melancholic',
-    'Uplifting',
-    'Peaceful',
-    'Dark',
-    'Dreamy',
-    'Aggressive',
-    'Chill',
-    'Epic',
-    'Nostalgic',
+    'Vulnerable',
+    'Lonely',
+    'Rebellious',
+    'Gritty',
+    'Driving',
+    'Raw',
+    'Defiant',
     'Anxious',
-    'Excited',
+    'Resolute',
+    'Smooth',
+    'Sultry',
+    'Sophisticated',
+    'Improvisational',
+    'Laid-back',
+    'Swinging',
+    'Majestic',
+    'Serene',
+    'Dramatic',
+    'Contemplative',
+    'Pastoral',
+    'Romantic',
+    'Futuristic',
+    'Hypnotic',
+    'Chilled',
+    'Atmospheric',
+    'Glitchy',
+    'Confident',
+    'Swaggering',
+    'Introspective',
+    'Groove-heavy',
+    'Braggadocious',
+    'Sensual',
+    'Soulful',
+    'Intimate',
+    'Mellow',
+    'Nostalgic',
+    'Heartfelt',
+    'Story-driven',
+    'Twangy',
     'Reflective',
-    'Funky',
-    'Groovy',
+    'Down-home',
+    'Aggressive',
+    'Dark',
     'Intense',
-    'Playful',
-    'Solemn',
+    'Brooding',
+    'Epic',
+    'Technical',
+    'Meditative',
+    'Ethereal',
+    'Spacious',
+    'Minimalistic',
+    'Transcendental',
+    'Organic',
+    'Groovy',
+    'Uplifting',
+    'I-rie',
+    'Skanking',
+    'Earthy',
+    'Earnest',
+    'Wistful',
+    'Acoustic',
+    'Storytelling',
   ];
+
   const genreList = [
     'Acid House',
     'Acid Jazz',
@@ -674,7 +719,7 @@ export const RiffusionPromptComposer = () => {
             <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
               <div className="p-2">
                 {moodList.map(mood => (
-                  <div key={mood} className="flex items-center py-1.5">
+                  <div key={mood} className="flex items-center p-1">
                     <Checkbox
                       id={`mood-${mood}`}
                       checked={selectedMoods.includes(mood)}
@@ -692,9 +737,9 @@ export const RiffusionPromptComposer = () => {
               </div>
             </PopoverContent>
           </Popover>
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {selectedMoods.map(mood => (
-              <Badge key={mood}>
+              <Badge key={mood} className="cursor-pointer" onClick={() => handleMoodSelect(mood)}>
                 {mood} &times;
               </Badge>
             ))}
@@ -721,7 +766,7 @@ export const RiffusionPromptComposer = () => {
             <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
               <div className="p-2">
                 {genreList.map(genre => (
-                  <div key={genre} className="flex items-center py-1.5">
+                  <div key={genre} className="flex items-center p-1">
                     <Checkbox
                       id={`genre-${genre}`}
                       checked={selectedGenres.includes(genre)}
@@ -739,9 +784,9 @@ export const RiffusionPromptComposer = () => {
               </div>
             </PopoverContent>
           </Popover>
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {selectedGenres.map(genre => (
-              <Badge key={genre}>
+              <Badge key={genre} className="cursor-pointer" onClick={() => handleGenreSelect(genre)}>
                 {genre} &times;
               </Badge>
             ))}
@@ -765,27 +810,23 @@ export const RiffusionPromptComposer = () => {
 
         {/* Display Generated AI Layers */}
         {aiLayers && !isSuggesting && (
-          <div>
+          <div className="grid gap-4 p-4 border rounded-md">
             <h3 className="text-lg font-semibold">Generated Layer Suggestions:</h3>
             {[
               {title: 'Layer 1 (Foundational)', prompt: aiLayers.layer1Prompt},
               {title: 'Layer 2 (Supporting)', prompt: aiLayers.layer2Prompt},
               {title: 'Layer 3 (Intricate)', prompt: aiLayers.layer3Prompt},
             ].map((layer, index) => layer.prompt && (
-                <div key={index} className="mb-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {layer.title}
-                        <Button onClick={() => handleCopyLayerClick(layer.prompt)} size="sm" className="ml-2">
-                          Copy
-                        </Button>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Textarea readOnly value={layer.prompt} className="min-h-[80px]" />
-                    </CardContent>
-                  </Card>
+                <div key={index} className="grid gap-2">
+                  <div className="flex justify-between items-center">
+                    <CardTitle>{layer.title}</CardTitle>
+                    <Button onClick={() => handleCopyLayerClick(layer.prompt)} size="sm" className="ml-2">
+                      Copy
+                    </Button>
+                  </div>
+                  <CardContent>
+                    <Textarea readOnly value={layer.prompt} className="min-h-[80px]" />
+                  </CardContent>
                 </div>
               ))}
           </div>
@@ -802,22 +843,19 @@ export const RiffusionPromptComposer = () => {
           Generate Riffusion Prompt
         </Button>
         {generatedPrompt && (
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                Final Combined Prompt
-                <Button onClick={handleCopyClick} size="sm" className="ml-2">
-                  Copy
-                </Button>
-              </CardTitle>
-            </CardHeader>
+          <div className="grid gap-2">
+            <div className="flex justify-between items-center">
+              <CardTitle>Final Combined Prompt</CardTitle>
+              <Button onClick={handleCopyClick} size="sm" className="ml-2">
+                Copy
+              </Button>
+            </div>
             <CardContent>
               <Textarea readOnly value={generatedPrompt} className="min-h-[80px]" />
             </CardContent>
-          </Card>
+          </div>
         )}
       </div>
     </div>
   );
 };
-
