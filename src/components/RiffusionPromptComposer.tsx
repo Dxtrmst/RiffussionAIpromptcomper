@@ -17,6 +17,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Icons} from '@/components/icons';
 import {useToast} from '@/hooks/use-toast';
+import {ScrollArea} from "@/components/ui/scroll-area";
 
 export const RiffusionPromptComposer = () => {
   const [generatedPrompt, setGeneratedPrompt] = useState('');
@@ -698,7 +699,6 @@ export const RiffusionPromptComposer = () => {
             disabled={isSuggesting}
           />
         </div>
-
         {/* Mood Multi-Select */}
         <div className="grid gap-2">
           <Label>Moods</Label>
@@ -717,33 +717,35 @@ export const RiffusionPromptComposer = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-              <div className="p-2">
-                {moodList.map(mood => (
-                  <div key={mood} className="flex items-center p-1">
-                    <Checkbox
-                      id={`mood-${mood}`}
-                      checked={selectedMoods.includes(mood)}
-                      onCheckedChange={() => handleMoodSelect(mood)}
-                      disabled={isSuggesting}
-                    />
-                    <Label
-                      htmlFor={`mood-${mood}`}
-                      className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}
-                    >
-                      {mood}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              <ScrollArea>
+                <div className="p-2">
+                  {moodList.map(mood => (
+                    
+                      <Checkbox
+                        id={`mood-${mood}`}
+                        checked={selectedMoods.includes(mood)}
+                        onCheckedChange={() => handleMoodSelect(mood)}
+                        disabled={isSuggesting}
+                      />
+                      <Label
+                        htmlFor={`mood-${mood}`}
+                        className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}
+                      >
+                        {mood}
+                      </Label>
+                    
+                  ))}
+                </div>
+              </ScrollArea>
             </PopoverContent>
           </Popover>
-          <div className="flex flex-wrap gap-1">
+          
             {selectedMoods.map(mood => (
               <Badge key={mood} className="cursor-pointer" onClick={() => handleMoodSelect(mood)}>
                 {mood} &times;
               </Badge>
             ))}
-          </div>
+          
         </div>
 
         {/* Genre Multi-Select */}
@@ -764,33 +766,35 @@ export const RiffusionPromptComposer = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-              <div className="p-2">
-                {genreList.map(genre => (
-                  <div key={genre} className="flex items-center p-1">
-                    <Checkbox
-                      id={`genre-${genre}`}
-                      checked={selectedGenres.includes(genre)}
-                      onCheckedChange={() => handleGenreSelect(genre)}
-                      disabled={isSuggesting}
-                    />
-                    <Label
-                      htmlFor={`genre-${genre}`}
-                      className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}
-                    >
-                      {genre}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              <ScrollArea>
+                <div className="p-2" style={{ maxHeight: '300px', overflowY: 'auto', position: 'relative' }}>
+                  {genreList.map(genre => (
+                    
+                      <Checkbox
+                        id={`genre-${genre}`}
+                        checked={selectedGenres.includes(genre)}
+                        onCheckedChange={() => handleGenreSelect(genre)}
+                        disabled={isSuggesting}
+                      />
+                      <Label
+                        htmlFor={`genre-${genre}`}
+                        className={`cursor-pointer ${isSuggesting ? 'text-muted-foreground' : ''}`}
+                      >
+                        {genre}
+                      </Label>
+                    
+                  ))}
+                </div>
+              </ScrollArea>
             </PopoverContent>
           </Popover>
-          <div className="flex flex-wrap gap-1">
+          
             {selectedGenres.map(genre => (
               <Badge key={genre} className="cursor-pointer" onClick={() => handleGenreSelect(genre)}>
                 {genre} &times;
               </Badge>
             ))}
-          </div>
+          
         </div>
 
         {/* Button to trigger AI suggestion */}
@@ -810,26 +814,28 @@ export const RiffusionPromptComposer = () => {
 
         {/* Display Generated AI Layers */}
         {aiLayers && !isSuggesting && (
-          <div className="grid gap-4 p-4 border rounded-md">
-            <h3 className="text-lg font-semibold">Generated Layer Suggestions:</h3>
-            {[
-              {title: 'Layer 1 (Foundational)', prompt: aiLayers.layer1Prompt},
-              {title: 'Layer 2 (Supporting)', prompt: aiLayers.layer2Prompt},
-              {title: 'Layer 3 (Intricate)', prompt: aiLayers.layer3Prompt},
-            ].map((layer, index) => layer.prompt && (
-                <div key={index} className="grid gap-2">
-                  <div className="flex justify-between items-center">
-                    <CardTitle>{layer.title}</CardTitle>
-                    <Button onClick={() => handleCopyLayerClick(layer.prompt)} size="sm" className="ml-2">
-                      Copy
-                    </Button>
-                  </div>
-                  <CardContent>
-                    <Textarea readOnly value={layer.prompt} className="min-h-[80px]" />
-                  </CardContent>
-                </div>
-              ))}
-          </div>
+          
+            
+              <h3 className="text-lg font-semibold">Generated Layer Suggestions:</h3>
+              {[
+                {title: 'Layer 1 (Foundational)', prompt: aiLayers.layer1Prompt},
+                {title: 'Layer 2 (Supporting)', prompt: aiLayers.layer2Prompt},
+                {title: 'Layer 3 (Intricate)', prompt: aiLayers.layer3Prompt},
+              ].map((layer, index) => layer.prompt && (
+                  
+                    
+                      {layer.title}
+                      <Button onClick={() => handleCopyLayerClick(layer.prompt)} size="sm" className="ml-2">
+                        Copy
+                      </Button>
+                    
+                    
+                      <Textarea readOnly value={layer.prompt} className="min-h-[80px]" />
+                    
+                  
+                ))}
+            
+          
         )}
       </div>
 
@@ -843,17 +849,17 @@ export const RiffusionPromptComposer = () => {
           Generate Riffusion Prompt
         </Button>
         {generatedPrompt && (
-          <div className="grid gap-2">
-            <div className="flex justify-between items-center">
-              <CardTitle>Final Combined Prompt</CardTitle>
+          
+            
+              Final Combined Prompt
               <Button onClick={handleCopyClick} size="sm" className="ml-2">
                 Copy
               </Button>
-            </div>
-            <CardContent>
+            
+            
               <Textarea readOnly value={generatedPrompt} className="min-h-[80px]" />
-            </CardContent>
-          </div>
+            
+          
         )}
       </div>
     </div>
